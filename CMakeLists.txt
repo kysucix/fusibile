@@ -35,7 +35,6 @@ cuda_add_executable(
     algorithmparameters.h
     cameraparameters.h
     linestate.h
-    groundTruthUtils.h
     displayUtils.h
     mathUtils.h
     fileIoUtils.h
