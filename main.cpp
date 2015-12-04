@@ -563,6 +563,7 @@ static int runFusibile (int argc,
     const char* gt_opt = "-gt";
     const char* gt_nocc_opt = "-gt_nocc";
     const char* pmvs_folder_opt = "--pmvs_folder";
+    const char* remove_black_background_opt = "-remove_black_background";
     //read in arguments
     for ( int i = 1; i < argc; i++ )
     {
@@ -587,6 +588,8 @@ static int runFusibile (int argc,
         else if ( strncmp ( argv[i], pmvs_folder_opt, strlen ( pmvs_folder_opt ) ) == 0 ) {
             inputFiles.pmvs_folder = argv[++i];
         }
+        else if ( strcmp ( argv[i], remove_black_background_opt ) == 0 )
+            algParameters.remove_black_background = true;
     }
 
     if (inputFiles.pmvs_folder.size()>0) {

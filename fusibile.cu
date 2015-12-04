@@ -251,21 +251,24 @@ __global__ void fusibile (GlobalState &gs, int ref_camera)
     // (optional) save texture
     if (number_consistent >= gs.params->numConsistentThresh) {
         //printf("\tEnough consistent points!\nSaving point %f %f %f", consistent_X.x, consistent_X.y, consistent_X.z);
-        gs.pc->points[center].coord  = consistent_X;
-        gs.pc->points[center].normal = consistent_normal;
+        if (gs.params->remove_black_background && consistent_texture>20) // hardcoded for middlebury TODO FIX
+        {
+            gs.pc->points[center].coord  = consistent_X;
+            gs.pc->points[center].normal = consistent_normal;
 
 #ifdef SAVE_TEXTURE
-        if (gs.params->saveTexture)
-            gs.pc->points[center].texture = consistent_texture;
+            if (gs.params->saveTexture)
+                gs.pc->points[center].texture = consistent_texture;
 #endif
 
-        //// Mark corresponding point on other views as "used"
-        for ( int i = 0; i < camParams.viewSelectionSubsetNumber; i++ ) {
-            int idxCurr = camParams.viewSelectionSubset[i];
-            if (used_list[idxCurr].x==-1)
-                continue;
-            //printf("Used list point on camera %d is %d %d\n", idxCurr, used_list[idxCurr].x, used_list[idxCurr].y);
-            gs.lines[idxCurr].used_pixels [used_list[idxCurr].x + used_list[idxCurr].y*cols] = 1;
+            //// Mark corresponding point on other views as "used"
+            for ( int i = 0; i < camParams.viewSelectionSubsetNumber; i++ ) {
+                int idxCurr = camParams.viewSelectionSubset[i];
+                if (used_list[idxCurr].x==-1)
+                    continue;
+                //printf("Used list point on camera %d is %d %d\n", idxCurr, used_list[idxCurr].x, used_list[idxCurr].y);
+                gs.lines[idxCurr].used_pixels [used_list[idxCurr].x + used_list[idxCurr].y*cols] = 1;
+            }
         }
     }
 

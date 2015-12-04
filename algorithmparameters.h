@@ -42,6 +42,7 @@ public:
     bool storePlyFiles;
     bool gt_compare;
     bool gt_normal_compare;
+    bool remove_black_background;
 
     //threshold for consistency check
     float depthThresh;
@@ -77,6 +78,7 @@ public:
         viewSelection      = false;
         depthMin          = 2.0f; // CUDA
         depthMax          = 20.0f; // CUDA
+        remove_black_background = false; // CUDA
 
         storePlyFiles = true;
         gt_compare = false;
