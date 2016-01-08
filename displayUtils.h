@@ -30,7 +30,7 @@ Mat correctGamma( Mat& img, double gamma ) {
  LUT( img, lut_matrix, result );
 
  return result;
-};
+}
 
 
 static void getDisparityForDisplay(const Mat_<float> &disp, Mat &dispGray, Mat &dispColor, float numDisparities, float minDisp = 0.0f){
@@ -47,7 +47,7 @@ static void getDisparityForDisplay(const Mat_<float> &disp, Mat &dispGray, Mat &
 				dispColor.at<Vec3b>(y,x) = Vec3b(0,0,0);
 		}
 	}
-};
+}
 
 static void convertDisparityDepthImage(const Mat_<float> &dispL, Mat_<float> &d, float f, float baseline){
 	d = Mat::zeros(dispL.rows, dispL.cols, CV_32F);
@@ -56,7 +56,7 @@ static void convertDisparityDepthImage(const Mat_<float> &dispL, Mat_<float> &d,
 			d(y,x) = disparityDepthConversion(f,baseline,dispL(y,x));
 		}
 	}
-};
+}
 
 static string getColorString(uint8_t color){
 	stringstream ss;
@@ -76,7 +76,7 @@ static string getColorString(Vec3i color){
 	ss << (int)((float)color(2)/256.f) << " " << (int)((float)color(1)/256.f) << " " << (int)((float)color(0)/256.f);
 	return ss.str();
 }
-static void storePlyFileBinaryPointCloud (char* plyFilePath, PointCloudList &pc, Camera cam, Mat_<float> &distImg) {
+static void storePlyFileBinaryPointCloud (char* plyFilePath, PointCloudList &pc, Mat_<float> &distImg) {
     cout << "store 3D points to ply file" << endl;
 
     FILE *outputPly;
@@ -101,7 +101,7 @@ static void storePlyFileBinaryPointCloud (char* plyFilePath, PointCloudList &pc,
 
     //write data
 #pragma omp parallel for
-    for(int i = 0; i < pc.size; i++) {
+    for(size_t i = 0; i < pc.size; i++) {
         const Point_li &p = pc.points[i];
         const float4 normal = p.normal;
         float4 X = p.coord;
@@ -131,7 +131,7 @@ static void storePlyFileBinaryPointCloud (char* plyFilePath, PointCloudList &pc,
     }
     fclose(outputPly);
 }
-static void storeXYZPointCloud (char* plyFilePath, PointCloudList &pc, Camera cam, Mat_<float> &distImg) {
+static void storeXYZPointCloud (char* plyFilePath, PointCloudList &pc) {
     cout << "store 3D points to ply file" << endl;
 
 	ofstream myfile;
@@ -139,7 +139,7 @@ static void storeXYZPointCloud (char* plyFilePath, PointCloudList &pc, Camera ca
 
     //write data
 #pragma omp parallel for
-    for(int i = 0; i < pc.size; i++) {
+    for(size_t i = 0; i < pc.size; i++) {
         const Point_li &p = pc.points[i];
         const float4 normal = p.normal;
         float4 X = p.coord;
@@ -157,7 +157,7 @@ static void storeXYZPointCloud (char* plyFilePath, PointCloudList &pc, Camera ca
     }
 	myfile.close();
 }
-static void storePlyFileAsciiPointCloud (char* plyFilePath, PointCloudList &pc, Camera cam, Mat_<float> &distImg) {
+static void storePlyFileAsciiPointCloud (char* plyFilePath, PointCloudList &pc, Mat_<float> &distImg) {
 	cout << "store 3D points to ply file" << endl;
 
     /*FILE *outputPly;*/
@@ -201,7 +201,7 @@ static void storePlyFileAsciiPointCloud (char* plyFilePath, PointCloudList &pc, 
 
 	//write data
     #pragma omp parallel for
-    for(int i = 0; i < pc.size; i++) {
+    for(size_t i = 0; i < pc.size; i++) {
         const Point_li &p = pc.points[i];
         const float4 normal = p.normal;
         float4 X = p.coord;
@@ -233,7 +233,7 @@ static void storePlyFileAsciiPointCloud (char* plyFilePath, PointCloudList &pc, 
 /*fclose(outputPly);*/
 }
 //template <typename ImgType>
-static void storePlyFileBinaryPointCloud(char* plyFilePath, PointCloud &pc, Camera cam, Mat_<float> &distImg) {
+static void storePlyFileBinaryPointCloud(char* plyFilePath, PointCloud &pc, Mat_<float> &distImg) {
     cout << "store 3D points to ply file" << endl;
 
     FILE *outputPly;
@@ -261,11 +261,11 @@ static void storePlyFileBinaryPointCloud(char* plyFilePath, PointCloud &pc, Came
 /*#pragma omp parallel for*/
     for(int i = 0; i < pc.size; i++){
         const Point_cu &p = pc.points[i];
-        const float4 normal = p.normal;
+        //const float4 normal = p.normal;
         float4 X = p.coord;
         /*printf("Writing point %f %f %f\n", X.x, X.y, X.z);*/
         /*float color = p.texture;*/
-        const char color = 127.0f;
+        //const char color = 127.0f;
 
         if(!(X.x < FLT_MAX && X.x > -FLT_MAX) || !(X.y < FLT_MAX && X.y > -FLT_MAX) || !(X.z < FLT_MAX && X.z >= -FLT_MAX)){
             X.x = 0.0f;
@@ -442,4 +442,4 @@ static void getNormalsForDisplay(const Mat &normals, Mat &normals_display, int r
 	else
 		normals.convertTo(normals_display,CV_16U,32767,32767);
 	cvtColor(normals_display,normals_display,COLOR_RGB2BGR);
-};
+}

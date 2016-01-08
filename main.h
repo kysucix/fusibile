@@ -56,6 +56,7 @@ struct OutputFiles {
 
 struct Camera {
     Camera () : baseline ( 0.54f ), P ( Mat::eye ( 3,4,CV_32F ) ), R ( Mat::eye ( 3,3,CV_32F ) ), reference ( false ), depthMin ( 2.0f ), depthMax ( 20.0f ) {}
+    float baseline;
     Mat_<float> P;
     Mat_<float> P_inv;
     Mat_<float> M_inv;
@@ -63,7 +64,6 @@ struct Camera {
     Mat_<float> R;
     Mat_<float> t;
     Vec3f C;
-    float baseline;
     bool reference;
     float depthMin; //this could be figured out from the bounding volume (not done right now, but that's why this parameter is here as well and not only in AlgorithmParameters)
     float depthMax; //this could be figured out from the bounding volume (not done right now, but that's why this parameter is here as well and not only in AlgorithmParameters)

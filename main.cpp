@@ -56,7 +56,7 @@ struct InputData{
 };
 
 int getCameraFromId(string id, vector<Camera> &cameras){
-    for(int i =0; i< cameras.size(); i++) {
+    for(size_t i =0; i< cameras.size(); i++) {
         //cout << "Checking camera id " << i << " cameraid " << cameras[i].id << endl;
         if(cameras[i].id.compare(id) == 0)
             return i;
@@ -362,7 +362,7 @@ static void selectViews ( CameraParameters &cameraParams, int imgWidth, int imgH
 
     cameraParams.viewSelectionSubset.clear ();
 
-    Vec3f viewVectorRef = getViewVector ( ref, x, y, cameraParams.rectified );
+    Vec3f viewVectorRef = getViewVector ( ref, x, y);
 
     // TODO hardcoded value makes it a parameter
     float minimum_angle_degree = 10;
@@ -379,7 +379,7 @@ static void selectViews ( CameraParameters &cameraParams, int imgWidth, int imgH
             continue;
         }
 
-        Vec3f vec = getViewVector ( cameras[i], x, y, cameraParams.rectified );
+        Vec3f vec = getViewVector ( cameras[i], x, y);
 
         float angle = getAngle ( viewVectorRef, vec );
         if ( angle > minimum_angle_radians && angle < maximum_angle_radians ) //0.6 select if angle between 5.7 and 34.8 (0.6) degrees (10 and 30 degrees suggested by some paper)
@@ -439,7 +439,7 @@ static void addImageToTextureUint (vector<Mat_<uint8_t> > &imgs, cudaTextureObje
         texDesc.normalizedCoords = 0;
 
         // Create texture object
-        cudaTextureObject_t &texObj = texs[i];
+        //cudaTextureObject_t &texObj = texs[i];
         checkCudaErrors(cudaCreateTextureObject(&(texs[i]), &resDesc, &texDesc, NULL));
         //texs[i] = texObj;
     }
@@ -447,7 +447,7 @@ static void addImageToTextureUint (vector<Mat_<uint8_t> > &imgs, cudaTextureObje
 }
 static void addImageToTextureFloatColor (vector<Mat > &imgs, cudaTextureObject_t texs[])
 {
-    for (int i=0; i<imgs.size(); i++)
+    for (size_t i=0; i<imgs.size(); i++)
     {
         int rows = imgs[i].rows;
         int cols = imgs[i].cols;
@@ -486,7 +486,6 @@ static void addImageToTextureFloatColor (vector<Mat > &imgs, cudaTextureObject_t
         texDesc.normalizedCoords = 0;
 
         // Create texture object
-        cudaTextureObject_t &texObj = texs[i];
         checkCudaErrors(cudaCreateTextureObject(&(texs[i]), &resDesc, &texDesc, NULL));
     }
     return;
@@ -494,7 +493,7 @@ static void addImageToTextureFloatColor (vector<Mat > &imgs, cudaTextureObject_t
 
 static void addImageToTextureFloatGray (vector<Mat > &imgs, cudaTextureObject_t texs[])
 {
-    for (int i=0; i<imgs.size(); i++)
+    for (size_t i=0; i<imgs.size(); i++)
     {
         int rows = imgs[i].rows;
         int cols = imgs[i].cols;
@@ -537,7 +536,6 @@ static void addImageToTextureFloatGray (vector<Mat > &imgs, cudaTextureObject_t 
         texDesc.normalizedCoords = 0;
 
         // Create texture object
-        cudaTextureObject_t &texObj = texs[i];
         checkCudaErrors(cudaCreateTextureObject(&(texs[i]), &resDesc, &texDesc, NULL));
         //texs[i] = texObj;
     }
@@ -545,10 +543,7 @@ static void addImageToTextureFloatGray (vector<Mat > &imgs, cudaTextureObject_t 
 }
 static int runFusibile (int argc,
                         char **argv,
-                        OutputFiles &outputFiles,
-                        AlgorithmParameters &algParameters,
-                        bool no_display,
-                        Results &results
+                        AlgorithmParameters &algParameters
                        )
 {
     InputFiles inputFiles;
@@ -640,7 +635,7 @@ static int runFusibile (int argc,
 
 
     map< int,string> consideredIds;
-    for(int i=0;i<subfolders.size();i++) {
+    for(size_t i=0;i<subfolders.size();i++) {
         //make sure that it has the right format (DATE_TIME_INDEX)
         size_t n = std::count(subfolders[i].begin(), subfolders[i].end(), '_');
         if(n < 2)
@@ -679,9 +674,9 @@ static int runFusibile (int argc,
     vector<Mat_<uint8_t> > img_grayscale;
     for ( size_t i = 0; i < numImages; i++ ) {
         //printf ( "Opening image %ld: %s\n", i, ( inputFiles.images_folder + inputFiles.img_filenames[i] ).c_str () );
-        img_grayscale.push_back ( imread ( ( " ", inputFiles.images_folder + inputFiles.img_filenames[i] ), IMREAD_GRAYSCALE ) );
+        img_grayscale.push_back ( imread ( ( inputFiles.images_folder + inputFiles.img_filenames[i] ), IMREAD_GRAYSCALE ) );
         if ( algParameters.color_processing ) {
-            img_color.push_back ( imread ( ( " ", inputFiles.images_folder + inputFiles.img_filenames[i] ), IMREAD_COLOR ) );
+            img_color.push_back ( imread ( ( inputFiles.images_folder + inputFiles.img_filenames[i] ), IMREAD_COLOR ) );
         }
 
         if ( img_grayscale[i].rows == 0 ) {
@@ -702,9 +697,6 @@ static int runFusibile (int argc,
     cudaMemGetInfo( &avail, &total );
     used = total - avail;
     printf("Device memory used: %fMB\n", used/1000000.0f);
-
-
-    uint32_t numPixels = ( uint32_t ) img_grayscale[0].rows * ( uint32_t ) img_grayscale[0].cols;
 
     uint32_t rows = img_grayscale[0].rows;
     uint32_t cols = img_grayscale[0].cols;
@@ -753,7 +745,7 @@ static int runFusibile (int argc,
         dat.camId = camIdx;
         dat.cam = camParams.cameras[camIdx];
         dat.path = results_folder + subfolders[i];
-        dat.inputImage = imread((" ",inputFiles.images_folder + id + ext), IMREAD_COLOR);
+        dat.inputImage = imread((inputFiles.images_folder + id + ext), IMREAD_COLOR);
 
         //read normal
         cout << "Reading normal " << i << endl;
@@ -790,7 +782,7 @@ static int runFusibile (int argc,
     gs->pc->cols = img_grayscale[0].cols;
 
     // Resize lines
-    for (int i = 0; i<img_grayscale.size(); i++)
+    for (size_t i = 0; i<img_grayscale.size(); i++)
     {
         gs->lines[i].resize(img_grayscale[0].rows * img_grayscale[0].cols);
         gs->lines[i].n = img_grayscale[0].rows * img_grayscale[0].cols;
@@ -804,7 +796,7 @@ static int runFusibile (int argc,
     vector<Mat > img_color_float_alpha         (img_grayscale.size());
     vector<Mat > normals_and_depth             (img_grayscale.size());
     vector<Mat_<uint16_t> > img_grayscale_uint (img_grayscale.size());
-    for (int i = 0; i<img_grayscale.size(); i++)
+    for (size_t i = 0; i<img_grayscale.size(); i++)
     {
         //img_grayscale[i].convertTo(img_grayscale_float[i], CV_32FC1, 1.0/255.0); // or CV_32F works (too)
         img_grayscale[i].convertTo(img_grayscale_float[i], CV_32FC1); // or CV_32F works (too)
@@ -826,16 +818,17 @@ static int runFusibile (int argc,
         merge (normal, normals_and_depth[i]);
 
     }
-    int64_t t = getTickCount () - t;
+    //int64_t t = getTickCount ();
 
     // Copy images to texture memory
-    if (algParameters.saveTexture)
+    if (algParameters.saveTexture) {
         if (algParameters.color_processing)
             addImageToTextureFloatColor (img_color_float_alpha, gs->imgs);
         else
             addImageToTextureFloatGray (img_grayscale_float, gs->imgs);
+    }
 
-        addImageToTextureFloatColor (normals_and_depth, gs->normals_depths);
+    addImageToTextureFloatColor (normals_and_depth, gs->normals_depths);
 
 #define pow2(x) ((x)*(x))
 #define get_pow2_norm(x,y) (pow2(x)+pow2(y))
@@ -847,7 +840,7 @@ static int runFusibile (int argc,
     sprintf ( plyFile, "%s/final3d_model.ply", output_folder);
     printf("Writing ply file %s\n", plyFile);
     //storePlyFileAsciiPointCloud ( plyFile, pc_list, inputData[0].cam, distImg);
-    storePlyFileBinaryPointCloud ( plyFile, pc_list, inputData[0].cam, distImg);
+    storePlyFileBinaryPointCloud ( plyFile, pc_list, distImg);
     char xyzFile[256];
     sprintf ( xyzFile, "%s/final3d_model.xyz", output_folder);
     printf("Writing ply file %s\n", xyzFile);
@@ -875,7 +868,7 @@ int main(int argc, char **argv)
         return ret;
 
     Results results;
-    ret = runFusibile ( argc, argv, outputFiles, *algParameters, no_display, results);
+    ret = runFusibile ( argc, argv, *algParameters);
 
     return 0;
 }
