@@ -6,6 +6,10 @@
 #include <sstream>
 #include <fstream>
 
+#if (CV_MAJOR_VERSION ==2)
+#include <opencv2/contrib/contrib.hpp> // needed for applyColorMap!
+#endif
+
 #include "point_cloud.h"
 #include "point_cloud_list.h"
 
