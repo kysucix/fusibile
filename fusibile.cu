@@ -251,7 +251,7 @@ __global__ void fusibile (GlobalState &gs, int ref_camera)
     // (optional) save texture
     if (number_consistent >= gs.params->numConsistentThresh) {
         //printf("\tEnough consistent points!\nSaving point %f %f %f", consistent_X.x, consistent_X.y, consistent_X.z);
-        if (!gs.params->remove_black_background || consistent_texture>20) // hardcoded for middlebury TODO FIX
+        if (!gs.params->remove_black_background || consistent_texture>15) // hardcoded for middlebury TODO FIX
         {
             gs.pc->points[center].coord  = consistent_X;
             gs.pc->points[center].normal = consistent_normal;
