@@ -19,7 +19,14 @@
 #include <cuda_runtime_api.h>
 #include <cuda_texture_types.h>
 #include <vector_types.h>
+
+
+#ifdef _MSC_VER
+#include <io.h>
+#define R_OK 04
+#else
 #include <unistd.h>
+#endif
 
 // CUDA helper functions
 #include "helper_cuda.h"         // helper functions for CUDA error check
@@ -592,7 +599,7 @@ static int runFusibile (int argc,
         inputFiles.p_folder = inputFiles.pmvs_folder + "/txt/";
     }
     cout <<"image folder is " << inputFiles.images_folder << endl;
-    cout <<"p folder is " << inputFiles.images_folder << endl;
+    cout <<"p folder is " << inputFiles.p_folder << endl;
     cout <<"pmvs folder is " << inputFiles.pmvs_folder << endl;
 
     GTcheckParameters gtParameters;
