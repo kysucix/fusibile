@@ -834,16 +834,16 @@ static int runFusibile (int argc,
 #define get_pow2_norm(x,y) (pow2(x)+pow2(y))
 
     runcuda(*gs, pc_list, numSelViews);
-    Mat_<Vec3f> norm0 = Mat::zeros ( img_grayscale[0].rows, img_grayscale[0].cols, CV_32FC3 );
+    //Mat_<Vec3f> norm0 = Mat::zeros ( img_grayscale[0].rows, img_grayscale[0].cols, CV_32FC3 );
     Mat_<float> distImg;
     char plyFile[256];
     sprintf ( plyFile, "%s/final3d_model.ply", output_folder);
     printf("Writing ply file %s\n", plyFile);
     //storePlyFileAsciiPointCloud ( plyFile, pc_list, inputData[0].cam, distImg);
     storePlyFileBinaryPointCloud ( plyFile, pc_list, distImg);
-    char xyzFile[256];
-    sprintf ( xyzFile, "%s/final3d_model.xyz", output_folder);
-    printf("Writing ply file %s\n", xyzFile);
+    //char xyzFile[256];
+    //sprintf ( xyzFile, "%s/final3d_model.xyz", output_folder);
+    //printf("Writing ply file %s\n", xyzFile);
     //storeXYZPointCloud ( xyzFile, pc_list, inputData[0].cam, distImg);
 
     return 0;
