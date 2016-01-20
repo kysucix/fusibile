@@ -1,5 +1,5 @@
 #pragma once
-#define MAX_IMAGES 64
+#define MAX_IMAGES 1024
 
 #define BLOCKSIZE_W 11 + 1 // +1 for the gradient computation
 #define BLOCKSIZE_H 11 + 1 // +1 for the gradient computation
