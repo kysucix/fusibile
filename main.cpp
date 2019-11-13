@@ -1,6 +1,8 @@
 #ifdef _WIN32
+#define NOMINMAX
 #include <windows.h>
 #include <ctime>
+#include "dirent.h"
 #include <direct.h>
 #endif
 
@@ -10,7 +12,7 @@
 #include <math.h>
 
 #include <sys/types.h>
-#include <dirent.h>
+#include "dirent.h"
 
 
 // Includes CUDA
@@ -665,11 +667,11 @@ static int runFusibile (int argc,
         //char outputPath[256];
         //sprintf(outputPath, "%s.png", id_string);
 
-        if( access( (inputFiles.images_folder + id_string + ".png").c_str(), R_OK ) != -1 )
+        if( _access( (inputFiles.images_folder + id_string + ".png").c_str(), R_OK ) != -1 )
             inputFiles.img_filenames.push_back((id_string + ".png"));
-        else if( access( (inputFiles.images_folder + id_string + ".jpg").c_str(), R_OK ) != -1 )
+        else if( _access( (inputFiles.images_folder + id_string + ".jpg").c_str(), R_OK ) != -1 )
             inputFiles.img_filenames.push_back((id_string + ".jpg"));
-        else if( access( (inputFiles.images_folder + id_string + ".ppm").c_str(), R_OK ) != -1 )
+        else if( _access( (inputFiles.images_folder + id_string + ".ppm").c_str(), R_OK ) != -1 )
             inputFiles.img_filenames.push_back((id_string + ".ppm"));
     }
     size_t numImages = inputFiles.img_filenames.size ();
