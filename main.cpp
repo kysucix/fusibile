@@ -2,6 +2,7 @@
 #define NOMINMAX
 #include <windows.h>
 #include <ctime>
+#include <direct.h>
 #include "win32_dirent.h"
 #define access _access
 #else

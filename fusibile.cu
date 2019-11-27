@@ -23,14 +23,14 @@
 #define SAVE_TEXTURE
 //#define SMOOTHNESS
 
-#define FORCEINLINE __forceinline__
-//#define FORCEINLINE
+#define FORCEINLINE_FUSIBILE __forceinline__
+//#define FORCEINLINE_FUSIBILE
 
 
 __device__ float K[16];
 __device__ float K_inv[16];
 
-/*__device__ FORCEINLINE __constant__ float4 camerasK[32];*/
+/*__device__ FORCEINLINE_FUSIBILE __constant__ float4 camerasK[32];*/
 
 /* compute depth value from disparity or disparity value from depth
  * Input:  f         - focal length in pixel
@@ -38,7 +38,7 @@ __device__ float K_inv[16];
  *         d - either disparity or depth value
  * Output: either depth or disparity value
  */
-__device__ FORCEINLINE float disparityDepthConversion_cu ( const float &f, const float &baseline, const float &d ) {
+__device__ FORCEINLINE_FUSIBILE float disparityDepthConversion_cu ( const float &f, const float &baseline, const float &d ) {
     return f * baseline / d;
 }
 
@@ -48,12 +48,12 @@ __device__ FORCEINLINE float disparityDepthConversion_cu ( const float &f, const
  *         d - either disparity or depth value
  * Output: either depth or disparity value
  */
-__device__ FORCEINLINE float disparityDepthConversion_cu2 ( const float &f, const Camera_cu &cam_ref, const Camera_cu &cam, const float &d ) {
+__device__ FORCEINLINE_FUSIBILE float disparityDepthConversion_cu2 ( const float &f, const Camera_cu &cam_ref, const Camera_cu &cam, const float &d ) {
     float baseline = l2_float4(cam_ref.C4 - cam.C4);
     return f * baseline / d;
 }
 
-__device__ FORCEINLINE void get3Dpoint_cu ( float4 * __restrict__ ptX, const Camera_cu &cam, const int2 &p, const float &depth ) {
+__device__ FORCEINLINE_FUSIBILE void get3Dpoint_cu ( float4 * __restrict__ ptX, const Camera_cu &cam, const int2 &p, const float &depth ) {
     // in case camera matrix is not normalized: see page 162, then depth might not be the real depth but w and depth needs to be computed from that first
     const float4 pt = make_float4 (
                                    depth * (float)p.x     - cam.P_col34.x,
@@ -63,7 +63,7 @@ __device__ FORCEINLINE void get3Dpoint_cu ( float4 * __restrict__ ptX, const Cam
 
     matvecmul4 (cam.M_inv, pt, ptX);
 }
-__device__ FORCEINLINE void get3Dpoint_cu1 ( float4 * __restrict__ ptX, const Camera_cu &cam, const int2 &p) {
+__device__ FORCEINLINE_FUSIBILE void get3Dpoint_cu1 ( float4 * __restrict__ ptX, const Camera_cu &cam, const int2 &p) {
     // in case camera matrix is not normalized: see page 162, then depth might not be the real depth but w and depth needs to be computed from that first
     float4 pt;
     pt.x = (float)p.x     - cam.P_col34.x;
@@ -73,11 +73,11 @@ __device__ FORCEINLINE void get3Dpoint_cu1 ( float4 * __restrict__ ptX, const Ca
     matvecmul4 (cam.M_inv, pt, ptX);
 }
 //get d parameter of plane pi = [nT, d]T, which is the distance of the plane to the camera center
-__device__ FORCEINLINE float getPlaneDistance_cu ( const float4 &normal, const float4 &X ) {
+__device__ FORCEINLINE_FUSIBILE float getPlaneDistance_cu ( const float4 &normal, const float4 &X ) {
     return -(dot4(normal,X));
 }
 
-__device__ FORCEINLINE void normalize_cu (float4 * __restrict__ v)
+__device__ FORCEINLINE_FUSIBILE void normalize_cu (float4 * __restrict__ v)
 {
     const float normSquared = pow2(v->x) + pow2(v->y) + pow2(v->z);
     const float inverse_sqrt = rsqrtf (normSquared);
@@ -85,7 +85,7 @@ __device__ FORCEINLINE void normalize_cu (float4 * __restrict__ v)
     v->y *= inverse_sqrt;
     v->z *= inverse_sqrt;
 }
-__device__ FORCEINLINE void getViewVector_cu (float4 * __restrict__ v, const Camera_cu &camera, const int2 &p)
+__device__ FORCEINLINE_FUSIBILE void getViewVector_cu (float4 * __restrict__ v, const Camera_cu &camera, const int2 &p)
 {
     get3Dpoint_cu1 (v, camera, p);
     sub((*v), camera.C4);
@@ -95,16 +95,16 @@ __device__ FORCEINLINE void getViewVector_cu (float4 * __restrict__ v, const Cam
     //v->z=1;
 }
 
-__device__ FORCEINLINE float l1_norm(float f) {
+__device__ FORCEINLINE_FUSIBILE float l1_norm(float f) {
     return fabsf(f);
 }
-__device__ FORCEINLINE float l1_norm(float4 f) {
+__device__ FORCEINLINE_FUSIBILE float l1_norm(float4 f) {
     return ( fabsf (f.x) +
              fabsf (f.y) +
              fabsf (f.z))*0.3333333f;
 
 }
-__device__ FORCEINLINE float l1_norm2(float4 f) {
+__device__ FORCEINLINE_FUSIBILE float l1_norm2(float4 f) {
     return ( fabsf (f.x) +
              fabsf (f.y) +
              fabsf (f.z));
@@ -115,7 +115,7 @@ __device__ FORCEINLINE float l1_norm2(float4 f) {
  * Input: v1,v2 - vectors
  * Output: angle in radian
  */
-__device__ FORCEINLINE float getAngle_cu ( const float4 &v1, const float4 &v2 ) {
+__device__ FORCEINLINE_FUSIBILE float getAngle_cu ( const float4 &v1, const float4 &v2 ) {
     float angle = acosf ( dot4(v1, v2));
     //if angle is not a number the dot product was 1 and thus the two vectors should be identical --> return 0
     if ( angle != angle )
@@ -124,7 +124,7 @@ __device__ FORCEINLINE float getAngle_cu ( const float4 &v1, const float4 &v2 ) 
     //cout << acosf ( v1.dot ( v2 ) ) << " / " << v1.dot ( v2 )<< " / " << v1<< " / " << v2 << endl;
     return angle;
 }
-__device__ FORCEINLINE void project_on_camera (const float4 &X, const Camera_cu &cam, float2 *pt, float *depth) {
+__device__ FORCEINLINE_FUSIBILE void project_on_camera (const float4 &X, const Camera_cu &cam, float2 *pt, float *depth) {
     float4 tmp = make_float4 (0, 0, 0, 0);
     matvecmul4P (cam.P, X, (&tmp));
     pt->x = tmp.x / tmp.z;
